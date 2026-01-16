@@ -2,12 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import { policy } from "./policy";
 import { buildContext } from "./context";
 import { AuthorizationError } from "./errors";
-import { PolicyResult } from "./types";
+import { PolicyResult, AuthorizeOptions } from "./types";
 
-export function authorize(action: string) {
+export function authorize(
+  action: string,
+  options: AuthorizeOptions = {}
+) {
   return async function (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ) {
     const policyFn = policy.get(action);
@@ -23,16 +26,51 @@ export function authorize(action: string) {
 
     try {
       const ctx = buildContext(req);
-      const result: PolicyResult = await policyFn(ctx);
 
-      const allowed =
-        typeof result === "boolean" ? result : result.allow;
+      // Global policy
+      const policyResult: PolicyResult = await policyFn(ctx);
 
-      if (!allowed) {
+      const policyAllowed =
+        typeof policyResult === "boolean"
+          ? policyResult
+          : policyResult.allow;
+
+      if (!policyAllowed) {
         const reason =
-          typeof result === "object" ? result.reason : undefined;
+          typeof policyResult === "object"
+            ? policyResult.reason
+            : undefined;
 
-        return next(new AuthorizationError(action, reason));
+        return next(
+          new AuthorizationError(
+            action,
+            options.explain ? reason : undefined
+          )
+        );
+      }
+
+      // Inline condition (when)
+      if (options.when) {
+        const whenResult = await options.when(ctx);
+
+        const whenAllowed =
+          typeof whenResult === "boolean"
+            ? whenResult
+            : whenResult.allow;
+
+        if (!whenAllowed) {
+          const reason =
+            typeof whenResult === "object"
+              ? whenResult.reason
+              : undefined;
+
+          return next(
+            new AuthorizationError(
+              action,
+              options.explain ? reason : undefined
+            )
+          );
+        }
       }
 
       return next();

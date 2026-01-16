@@ -18,3 +18,8 @@ export type PolicyResult =
 export type PolicyFn = (
   ctx: AuthorizationContext
 ) => PolicyResult | Promise<PolicyResult>;
+
+export interface AuthorizeOptions {
+  when?: PolicyFn;
+  explain?: boolean;
+}
