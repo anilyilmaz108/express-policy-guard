@@ -5,14 +5,21 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run test && npm run build"
   },
   "keywords": [
     "express",
     "authorization",
     "policy",
+    "rbac",
     "middleware",
-    "rbac"
+    "nodejs",
+    "security"
+  ],
+  "files": [
+  "dist",
+  "README.md"
   ],
   "peerDependencies": {
     "express": ">=4"
