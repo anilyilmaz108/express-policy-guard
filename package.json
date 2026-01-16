@@ -1,12 +1,32 @@
 {
   "name": "express-policy-guard",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
-  "keywords": [],
+  "keywords": [
+    "express",
+    "authorization",
+    "policy",
+    "middleware",
+    "rbac"
+  ],
+  "peerDependencies": {
+    "express": ">=4"
+  },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "Declarative, context-aware authorization middleware for Express.js",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
 }
